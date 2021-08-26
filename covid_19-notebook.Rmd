@@ -1,0 +1,90 @@
+---
+title: "COVID Analysis"
+output: html_notebook
+---
+
+# Check out my COVID Analysis
+
+This is the approach I used. I got the data from this source: [ECDC](https://www.ecdc.europa.eu/en/publications-data/data-daily-new-cases-covid-19-eueea-country)
+
+# Import Data
+
+This is where we import data. 
+
+```{r}
+#these libraries need to be loaded
+library(utils)
+
+#read the Dataset sheet into “R”. The dataset will be called "data".
+data <- read.csv("https://opendata.ecdc.europa.eu/covid19/nationalcasedeath_eueea_daily_ei/csv", na.strings = "", fileEncoding = "UTF-8-BOM")
+```
+
+# Schedule R Scripts 
+
+```{r}
+library(taskscheduleR)
+
+taskscheduler_create(taskname = "test_run", rscript = "C:/Users/jzqma/Documents/GithubRepos/Basic-COVID19-ETL-Pipeline-R/covid_19-notebook.Rmd", 
+                     schedule = "ONCE", starttime = format(Sys.time() + 25, "%H:%M"))
+```
+```{r}
+#taskcheduler_stop("test_run")
+#taskscheduler_delete("test_run")
+```
+
+
+
+# Show Data Table
+
+```{r}
+library(dplyr)
+library(DT)
+
+edf <- data %>% group_by(countriesAndTerritories) %>% 
+  mutate(deathRate = sum(deaths) / sum(cases))
+
+datatable(edf, extensions = 'Buttons', options = list(
+  dom = 'Bfrtip',
+  buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+))
+
+
+
+```
+
+# Graph 1 {.tabset}
+
+## Graph A 
+```{r}
+library(ggplot2)
+
+edf %>% filter(deaths > 100) %>% 
+  group_by(countriesAndTerritories) %>% 
+  summarise(Deaths_Total = sum(deaths)) %>% 
+  ggplot(aes(x = countriesAndTerritories)) + 
+  geom_point(aes(y = Deaths_Total)) +
+  coord_flip()
+```
+
+
+## Graph B
+```{r}
+edf %>% filter(deaths > 100) %>% 
+  group_by(countriesAndTerritories) %>% 
+  summarise(Cases_Total = sum(cases)) %>% 
+  ggplot(aes(x = countriesAndTerritories)) + 
+  geom_point(aes(y = Cases_Total)) +
+  coord_flip()
+```
+
+
+
+
+
+
+
+
+
+
+
+
