@@ -76,7 +76,7 @@ edf %>% filter(deaths > 100) %>%
   geom_point(aes(y = Cases_Total)) +
   coord_flip()
 ```
-
+Input `rmarkdown::render('covid_19-notebook.Rmd')` in console to view HTML RMD 
 
 
 
